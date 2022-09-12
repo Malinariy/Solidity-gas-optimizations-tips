@@ -70,3 +70,20 @@ utf8len('FCash to redeem must be an index component')
 ⬜ UNNECESSARY COMPUTATION
 > Gas can be saved by avoiding using local variables when they are not necessary.
 ---
+⬜ UNNECESSARY COMPUTATION
+> Gas can be saved by avoiding using local variables when they are not necessary.
+---
+⬜ AVOID A SLOAD OPTIMISTICALLY - 2.1k gas saved
+
+---
+⬜ CHECK msg.value FIRST - 1 gas per instance
+> Reading msg.value costs 2 gas, while reading from memory costs 3, this will save 1 gas with no downside
+> `if (weth == asset && msg.value > 0)` change to `if (msg.value > 0 && weth == asset)`
+---
+⬜ MIXING RETURN AND NAMED RETURNS
+> Using both named returns and a return statement isn't necessary. Removing unused named return variables can reduce gas usage (MSTOREs/MLOADs) and improve code clarity. 
+> To save gas and improve code quality: consider using only one of those.
+---
+⬜ INLINE A MODIFIER THAT’S ONLY USED ONCE
+> If modifier is only used once in this contract, it should get inlined to save gas
+---
