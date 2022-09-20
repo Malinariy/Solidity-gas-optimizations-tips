@@ -117,6 +117,63 @@ utf8len('FCash to redeem must be an index component')
 > Explicitly initializing a variable with it's default value costs unnecesary gas
 
 ---
+
 ⬜ USE CUSTOM ERRORS INSTEAD OF REVERT STRINGS TO SAVE GAS
 > Custom errors from Solidity 0.8.4 are cheaper than revert strings (cheaper deployment cost and runtime cost when the revert condition is met) while providing the same amount of information
-> 
+
+---
+
+⬜ STATE VARIABLES ONLY SET IN THE CONSTRUCTOR SHOULD BE DECLARED `IMMUTABLE`
+> Avoids a `Gsset` (20000 gas) in the constructor, and replaces each `Gwarmacces` (100 gas) with a `PUSH32` (3 gas).
+
+---
+
+⬜ `INTERNAL` FUNCTIONS ONLY CALLED ONCE CAN BE INLINED TO SAVE GAS
+> Not inlining costs 20 to 40 gas because of two extra JUMP instructions and additional stack operations needed for function calls.
+
+---
+ 
+⬜ OPERATORS: AND/OR
+
+> When having a require statement with 2 or more expressions needed, place the expression that cost less gas first.
+For example:
+- require ( A || B ): If a is true, Solidity compiler won’t check the next statement because it’s not needed.
+- require ( A && B ): If a is false, Solidity compiler won’t check the next statement because it’s not needed.
+In this examples, the best approach would be placing the cheapest expression as A.
+
+---
+
+⬜ Always try reverting transactions as early as possible when using require statements (most preferably before writing in storage). 
+> In case a transaction revert occurs, the user will pay the gas up until the revert was executed (not afterwards).
+
+---
+
+⬜ USE `mapping` INSTEAD OF `array` (5000 gas saved per value)
+
+> Mappings are usually less expensive than arrays, but you can’t iterate over them.
+---
+
+⬜  USE `require` INSTEAD OF `assert`
+
+> Assert should NOT be used by other mean than testing purposes. (because when the assertion fails, gas is NOT refunded contrary to require)
+
+--- 
+
+⬜  Look for dead code (saves a variable amount of gas on deployment)
+
+Sometimes, developers forget to remove useless code like:
+```plain
+require(a == 0)
+if (a == 0) {
+  return true;
+} else {
+  return false
+}
+```
+
+---
+
+⬜ STORING DATA IN `events` (up to 20 000 gas saved on function call)
+> If you don’t need to access the data onchain in solidity, you can store it using events.
+---
+
